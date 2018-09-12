@@ -1,12 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
+const passport = require("passport");
 
 const User = require("../models/User");
-
-router.get("/register", (req, res) => {
-  res.send("register");
-});
 
 router.post("/register", (req, res) => {
   let { username, password } = req.body;
@@ -19,7 +16,6 @@ router.post("/register", (req, res) => {
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(newUser.password, salt, (err, hash) => {
       // err && console.log(err);
-
       newUser.password = hash;
       newUser.save((err, user) => {
         err && console.log(err);
@@ -28,6 +24,13 @@ router.post("/register", (req, res) => {
       });
     });
   });
+});
+
+router.post("/login", (req, res, next) => {
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/users/login"
+  })(req, res, next);
 });
 
 module.exports = router;
